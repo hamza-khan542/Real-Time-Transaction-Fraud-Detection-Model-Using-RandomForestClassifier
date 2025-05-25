@@ -1,7 +1,7 @@
 # Machine Learning Model Research Report
 
 ## Executive Summary
-This report presents a comprehensive analysis of our machine learning model's performance, focusing on fraud detection capabilities. The model demonstrates exceptional performance with an accuracy of 98.33%, precision of 100%, and recall of 96.67%, making it highly reliable for real-world applications.
+This report presents a comprehensive analysis of our machine learning model's performance on the cleaned transaction dataset. The model demonstrates exceptional performance with a mean cross-validation score of 98.28% (±0.03%), making it highly reliable for real-world fraud detection applications.
 
 ## 1. Introduction
 
@@ -9,207 +9,155 @@ This report presents a comprehensive analysis of our machine learning model's pe
 The model is designed to detect fraudulent transactions in financial data, with a focus on maintaining high precision while minimizing false positives.
 
 ### 1.2 Dataset Overview
-- Total samples: 1000
-- Class distribution: 30% positive (fraudulent), 70% negative (legitimate)
-- Key features: AMOUNT_TIME_Z_SCORE, TX_AMOUNT, AMOUNT_CATEGORY, AMOUNT_BIN, CUST_AVG_AMOUNT
+- Total samples: 3,036,370 transactions
+- Features: 26 columns including transaction details, customer information, and engineered features
+- Key features:
+  - Transaction details (ID, amount, time)
+  - Customer statistics (average amount, standard deviation)
+  - Time-based features (hour, day of week, month)
+  - Amount-based features (z-scores, categories, bins)
 
 ## 2. Model Performance Analysis
 
 ### 2.1 Overall Performance Metrics
-- Accuracy: 98.33%
-- Precision: 100%
-- Recall: 96.67%
-- F1-Score: 98.28%
+- Mean Cross-Validation Score: 98.28%
+- Cross-Validation Score Range: 98.26% - 98.30%
+- Standard Deviation: ±0.03%
 
 ### 2.2 Feature Importance Analysis
 The model's decision-making is primarily influenced by:
-1. AMOUNT_TIME_Z_SCORE (26.15%)
-2. TX_AMOUNT (24.65%)
-3. AMOUNT_CATEGORY (16.28%)
-4. AMOUNT_BIN (9.04%)
-5. CUST_AVG_AMOUNT (5.85%)
-
-These top two features account for approximately 50% of the model's decision-making process, indicating strong reliance on transaction amount patterns.
+1. AMOUNT_TIME_Z_SCORE
+2. TX_AMOUNT
+3. AMOUNT_CATEGORY
+4. AMOUNT_BIN
+5. CUST_AVG_AMOUNT
 
 ### 2.3 Cross-Validation Performance
 The model shows remarkable stability across different data splits:
 - Mean CV Score: 98.28%
 - Score Range: 98.26% - 98.30%
-- Low variance indicates robust generalization
+- Low variance (±0.03%) indicates robust generalization
 
-## 3. Detailed Performance Analysis
+## 3. Data Processing and Feature Engineering
 
-### 3.1 Confusion Matrix Analysis
-The confusion matrix reveals:
-- High true positive rate
-- Minimal false positives
-- Strong ability to identify fraudulent transactions
-- Excellent precision in positive predictions
+### 3.1 Data Cleaning
+- Handled missing values
+- Removed duplicates
+- Standardized data formats
 
-### 3.2 ROC and Precision-Recall Analysis
-- ROC AUC score indicates excellent discriminative ability
-- High precision-recall balance
-- Strong performance across different probability thresholds
+### 3.2 Feature Engineering
+1. Time-based features:
+   - Hour of day
+   - Day of week
+   - Month
 
-### 3.3 Calibration Analysis
-- Well-calibrated probability estimates
-- Confidence intervals show reliable predictions
-- Brier score indicates good probability calibration
+2. Amount-based features:
+   - Customer average amount
+   - Customer standard deviation
+   - Amount z-scores
+   - Amount categories
+   - Amount bins
 
-## 4. Model Strengths
+3. Customer-based features:
+   - Transaction count
+   - Average amount
+   - Standard deviation
+   - Min/max amounts
 
-1. **High Precision**
-   - 100% precision ensures minimal false alarms
-   - Critical for fraud detection where false positives are costly
+## 4. Model Architecture
 
-2. **Strong Generalization**
-   - Consistent performance across cross-validation folds
-   - Low variance in predictions
+### 4.1 Algorithm
+- Random Forest Classifier
+- Number of trees: 100
+- Maximum depth: 10
+- Random state: 42
+
+### 4.2 Training Process
+- 5-fold cross-validation
+- Stratified sampling
+- Parallel processing enabled
+
+## 5. Model Strengths
+
+1. **High Accuracy**
+   - 98.28% mean cross-validation score
+   - Low variance across folds
+
+2. **Robust Performance**
+   - Consistent results across different data splits
+   - Stable predictions
 
 3. **Feature Interpretability**
    - Clear hierarchy of feature importance
-   - Dominant features align with domain knowledge
+   - Domain-relevant features
 
-4. **Robust Performance**
-   - High accuracy across different metrics
-   - Balanced precision and recall
+## 6. Model Limitations
 
-## 5. Model Limitations
-
-1. **Class Imbalance**
-   - 30% positive class might affect rare fraud pattern detection
-   - Consider techniques for handling imbalanced data
+1. **Computational Resources**
+   - Large dataset (3M+ transactions)
+   - Memory-intensive feature engineering
 
 2. **Feature Dependencies**
-   - High correlation between top features
+   - High correlation between some features
    - Potential for feature redundancy
 
-## 6. Recommendations
+## 7. Recommendations
 
-### 6.1 Short-term Improvements
-1. Implement feature engineering for AMOUNT_TIME_Z_SCORE
-2. Explore feature interactions between top predictors
-3. Consider ensemble methods for rare fraud patterns
+### 7.1 Short-term Improvements
+1. Feature selection optimization
+2. Hyperparameter tuning
+3. Ensemble method exploration
 
-### 6.2 Long-term Considerations
-1. Regular model retraining with new data
-2. Continuous monitoring of feature importance shifts
-3. Implementation of adaptive thresholds
+### 7.2 Long-term Considerations
+1. Regular model retraining
+2. Feature importance monitoring
+3. Performance drift detection
 
-## 7. Conclusion
+## 8. Conclusion
 
-The model demonstrates exceptional performance in fraud detection, with particular strengths in precision and stability. The high accuracy and low false positive rate make it suitable for production deployment. Regular monitoring and updates will ensure continued effectiveness.
+The model demonstrates exceptional performance in fraud detection, with particular strengths in accuracy and stability. The high cross-validation score and low variance make it suitable for production deployment. Regular monitoring and updates will ensure continued effectiveness.
 
-## 8. Technical Appendix
+## 9. Technical Appendix
 
-### 8.1 Model Architecture
-- **Algorithm**: Random Forest Classifier
-  - Number of trees: 100
-  - Maximum depth: 10
-  - Minimum samples per leaf: 5
-  - Criterion: Gini impurity
-  - Bootstrap sampling: True
-  - Class weight: Balanced
+### 9.1 Model Parameters
+```python
+RandomForestClassifier(
+    n_estimators=100,
+    max_depth=10,
+    random_state=42,
+    n_jobs=-1
+)
+```
 
-- **Training Parameters**:
-  - Training set size: 70% of total data
-  - Validation set size: 15% of total data
-  - Test set size: 15% of total data
-  - Random state: 42
-  - Cross-validation folds: 5
+### 9.2 Feature List
+1. TRANSACTION_ID
+2. CUSTOMER_ID
+3. TERMINAL_ID
+4. TX_AMOUNT
+5. TX_TIME_SECONDS
+6. TX_TIME_DAYS
+7. TX_FRAUD
+8. TX_FRAUD_SCENARIO
+9. hour
+10. day_of_week
+11. month
+12. CUST_AVG_AMOUNT
+13. CUST_STD_AMOUNT
+14. CUST_MIN_AMOUNT
+15. CUST_MAX_AMOUNT
+16. CUST_TX_COUNT
+17. HOUR_AVG_AMOUNT
+18. HOUR_STD_AMOUNT
+19. AMOUNT_TO_CUST_AVG
+20. AMOUNT_TO_CUST_MAX
+21. AMOUNT_Z_SCORE
+22. IS_AMOUNT_UNUSUAL
+23. IS_AMOUNT_EXTREME
+24. AMOUNT_TIME_Z_SCORE
+25. AMOUNT_BIN
+26. AMOUNT_CATEGORY
 
-- **Hyperparameters** (optimized using GridSearchCV):
-  ```python
-  param_grid = {
-      'n_estimators': [50, 100, 200],
-      'max_depth': [5, 10, 15],
-      'min_samples_split': [2, 5, 10],
-      'min_samples_leaf': [1, 2, 4]
-  }
-  ```
-
-### 8.2 Performance Metrics
-Detailed metrics and visualizations are available in the following files:
-- feature_importance.png
-- performance_metrics.png
-- cv_scores.png
-- confusion_matrix.png
-- roc_curve.png
-- learning_curve.png
-- precision_recall_curve.png
-- feature_correlation.png
-- prediction_distribution.png
-- calibration_curve.png
-
-### 8.3 Data Preprocessing
-- **Feature Scaling**:
-  - StandardScaler for numerical features
-  - MinMaxScaler for bounded features (0-1 range)
-  - RobustScaler for features with outliers
-
-- **Missing Value Handling**:
-  - Numerical features: Median imputation
-  - Categorical features: Mode imputation
-  - Missing rate threshold: 30%
-
-- **Outlier Treatment**:
-  - IQR method for outlier detection
-  - Winsorization for extreme values
-  - Cap/floor values at 3 standard deviations
-
-- **Feature Engineering**:
-  ```python
-  # Time-based features
-  df['AMOUNT_TIME_Z_SCORE'] = (df['TX_AMOUNT'] - df['TX_AMOUNT'].rolling(window=24).mean()) / df['TX_AMOUNT'].rolling(window=24).std()
-  
-  # Amount categorization
-  df['AMOUNT_CATEGORY'] = pd.qcut(df['TX_AMOUNT'], q=5, labels=['Very Low', 'Low', 'Medium', 'High', 'Very High'])
-  
-  # Binning
-  df['AMOUNT_BIN'] = pd.cut(df['TX_AMOUNT'], bins=[0, 100, 500, 1000, 5000, float('inf')], labels=['0-100', '100-500', '500-1000', '1000-5000', '5000+'])
-  ```
-
-### 8.4 Implementation Details
-- **Code Structure**:
-  ```python
-  # Model Pipeline
-  pipeline = Pipeline([
-      ('preprocessor', preprocessor),
-      ('classifier', RandomForestClassifier())
-  ])
-  
-  # Cross-validation
-  cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-  
-  # Model evaluation
-  scoring = {
-      'accuracy': 'accuracy',
-      'precision': 'precision',
-      'recall': 'recall',
-      'f1': 'f1',
-      'roc_auc': 'roc_auc'
-  }
-  ```
-
-- **Performance Optimization**:
-  - Parallel processing for training
-  - Early stopping implementation
-  - Feature selection using SelectFromModel
-  - Memory optimization for large datasets
-
-### 8.5 Model Deployment
-- **API Endpoints**:
-  - Prediction endpoint: `/api/v1/predict`
-  - Model metrics endpoint: `/api/v1/metrics`
-  - Model update endpoint: `/api/v1/update`
-
-- **Monitoring**:
-  - Real-time performance tracking
-  - Drift detection
-  - Resource utilization monitoring
-  - Error rate tracking
-
-## 9. References
+## 10. References
 1. Breiman, L. (2001). Random Forests. Machine Learning, 45(1), 5-32.
 2. Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. JMLR 12, 2825-2830.
 3. Brownlee, J. (2020). Imbalanced Classification with Python. Machine Learning Mastery.
